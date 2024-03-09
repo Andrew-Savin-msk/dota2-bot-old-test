@@ -20,6 +20,7 @@ import (
 	"github.com/paralin/go-dota2/events"
 	gcmm "github.com/paralin/go-dota2/protocol"
 	"github.com/paralin/go-steam"
+	"github.com/paralin/go-steam/protocol"
 	"github.com/paralin/go-steam/protocol/steamlang"
 	"github.com/paralin/go-steam/trade"
 	"github.com/sirupsen/logrus"
@@ -76,7 +77,7 @@ func runWork(account *steam.LogOnDetails) {
 	t := trade.New(client.Web.SessionId, client.Web.SteamLogin, client.Web.SteamLoginSecure, client.SteamId())
 	for event := range client.Events() {
 		// event,
-		fmt.Println(event, reflect.TypeOf(event))
+		fmt.Println(reflect.TypeOf(event))
 		switch e := event.(type) {
 		//If stuck, then restart bot(i think default case is enough???)
 		// Ends bot work without disconnect
@@ -110,7 +111,13 @@ func runWork(account *steam.LogOnDetails) {
 		// Changed
 		case *steam.LoggedOnEvent:
 			log.Println("Logged in!")
-			fmt.Println(account)
+			// TODO: Разобраться с прото сообщениями, может выйдет считывать всё же.
+			packet := &protocol.Packet{}
+			packet.ReadProtoMsg(e.Body)
+			packet.
+				// client.Auth.HandlePacket(packet)
+				fmt.Println(packet)
+			// fmt.Println(account)
 			client.Social.SetPersonaState(steamlang.EPersonaState_Online)
 			dota.SetPlaying(true)
 			dota.SayHello()
